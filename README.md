@@ -231,7 +231,9 @@ scripts/
 docs/                      上传 / 下载 / 后端接口的实现说明与实测截图
   acceptance-report.md     验收报告：逐条 H/D/F 脱敏证据与结论
 openspec/                  OpenSpec 工作区
-  changes/add-auth-rbac-class-knowledge/   proposal / design / spec / tasks
+  specs/auth-upload/spec.md                正式规约：10 条需求 / 36 个场景
+  changes/archive/2026-09-23-add-auth-rbac-class-knowledge/
+                                           已归档变更：proposal / design / spec / tasks
 ```
 
 ## 八、进一步阅读

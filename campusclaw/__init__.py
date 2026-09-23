@@ -28,9 +28,6 @@ def prepare_storage_and_db(settings: Settings, env: dict[str, str] | None = None
     scenario = (env or {}).get("CAMPUSCLAW_TEST_SCENARIO", "") or os.environ.get(
         "CAMPUSCLAW_TEST_SCENARIO", ""
     )
-    if scenario == "restart":
-        # 仅在上一次调用已经完成过首轮启动时才可能命中，此处保留原 bpfobject 行为。
-        pass
     storage.ensure_directories(settings.upload_dir, settings.staging_dir)
     try:
         bootstrap.initialize(settings, env=env)

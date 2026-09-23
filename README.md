@@ -207,7 +207,8 @@ scripts/
   cleanup_files.py         重试待清理文件
   selfcheck.py             一键自检脚本（非业务代码）
 docs/                      上传 / 下载 / 后端接口的实现说明与实测截图
-openspec/                  OpenSpec 工作区脚手架
+openspec/                  OpenSpec 工作区
+  changes/add-auth-rbac-class-knowledge/   proposal / design / spec / tasks
 ```
 
 ## 八、进一步阅读

@@ -184,14 +184,29 @@ curl -i http://127.0.0.1:8080/materials      # 302 -> /login
 
 # 一键自检：临时目录起服务 + 四个账号依次登录 + 核对班级隔离
 python scripts/selfcheck.py
+
+# 全量验收：AC01–AC36 逐条执行并生成 docs/acceptance-report.md
+python scripts/acceptance.py
+
+# 只跑单个场景（按需排查）
+python scripts/acceptance.py --only AC07
 ```
 
-`scripts/selfcheck.py` 不会污染项目目录，跑完自动清理。
+`scripts/selfcheck.py` 与 `scripts/acceptance.py` 都不会污染项目目录，跑完自动清理。
+`acceptance.py` 中依赖 Docker 的 AC33/AC35 会调用 `scripts/acceptance_compose.py`；
+若本机 Docker 未运行或仓库不可达，这两条会如实记为阻塞/降级，不会伪装成通过。
 
-界面预览（视觉系统对齐 CampusClaw 官方演示站）：
+界面预览（自有视觉骨架：靛紫主色 + 顶部导航 + 居中内容壳）：
 
 - 登录页 [`docs/screenshots/08-ui-login.png`](docs/screenshots/08-ui-login.png)
 - 材料页 [`docs/screenshots/09-ui-materials.png`](docs/screenshots/09-ui-materials.png)
+
+版式说明：页面骨架自成一套，**不沿用**早期参考站的做法。
+
+- 设计令牌：主色靛紫 `#4a3f8f`（深 `#372e6d`）、强调青 `#0f7b7d`、圆角 10px、内容壳宽 1160px。
+- 布局：**顶部 appbar**（logo + 页签导航 + 账号区）+ 下方 banner（页面标题 + 统计条）+ 居中内容壳；**不使用侧边栏**。
+- 登录页：渐变底 + 居中卡片，附带两个演示账号的一键填充按钮（仅填表单，不绕过认证）。
+- 样式全部内联在模板中，页面无需额外静态资源即可正常渲染；模板内的接口调用与交互脚本与后端契约保持一致。
 
 ## 七、目录结构
 
@@ -211,7 +226,10 @@ campusclaw/
 scripts/
   cleanup_files.py         重试待清理文件
   selfcheck.py             一键自检脚本（非业务代码）
+  acceptance.py            AC01–AC36 全量验收执行器（隔离数据目录 + 真实 HTTP + 故障注入）
+  acceptance_compose.py    AC33/AC35 的 Docker Compose 验收执行器（子进程调用）
 docs/                      上传 / 下载 / 后端接口的实现说明与实测截图
+  acceptance-report.md     验收报告：逐条 H/D/F 脱敏证据与结论
 openspec/                  OpenSpec 工作区
   changes/add-auth-rbac-class-knowledge/   proposal / design / spec / tasks
 ```
@@ -222,6 +240,7 @@ openspec/                  OpenSpec 工作区
 - [`docs/01-文件上传逻辑与支持类型.md`](docs/01-文件上传逻辑与支持类型.md) —— 支持哪些类型、校验规则、错误码
 - [`docs/02-文件下载权限与实现逻辑.md`](docs/02-文件下载权限与实现逻辑.md) —— 下载权限模型，含未授权访问的实测截图
 - [`docs/03-后端API暴露与浏览器访问.md`](docs/03-后端API暴露与浏览器访问.md) —— 接口清单与浏览器直连方式
+- [`docs/acceptance-report.md`](docs/acceptance-report.md) —— AC01–AC36 验收结果，逐条 HTTP / 数据库 / 文件三类脱敏证据
 
 ## 九、已知限制
 

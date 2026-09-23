@@ -181,7 +181,10 @@ def upload_material(
             raise err("STORAGE_ERROR", 500) from exc
 
         stamp = now_iso()
-        conn.execute("BEGIN IMMEDIATE")
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+        except sqlite3.Error as exc:
+            raise err("DATABASE_ERROR", 500) from exc
         try:
             cursor = conn.execute(
                 "INSERT INTO materials(class_id, uploaded_by, title, original_filename, "

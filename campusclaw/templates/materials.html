@@ -1,133 +1,140 @@
 {% extends "base.html" %}
 {% block title %}教学材料 · CampusClaw{% endblock %}
 {% block body %}
-<div class="layout">
+<div class="app">
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">🎓</div>
-      <div class="brand-text">
-        <div class="brand-name">CampusClaw</div>
-        <div class="brand-sub">智能教学平台</div>
-      </div>
-    </div>
-    <div class="nav-role">{{ '教师端' if user.role == 'teacher' else '学生端' }}</div>
-    <nav class="nav">
-      <a class="nav-item nav-item-active" href="{{ url_for('pages.materials_page') }}">
-        <span class="nav-icon">📚</span><span>教学材料</span>
+  <header class="appbar">
+    <div class="appbar-inner">
+      <a class="logo" href="{{ url_for('pages.materials_page') }}">
+        <span class="logo-mark">🎓</span>
+        <span class="logo-text">
+          <strong>CampusClaw</strong>
+          <small>智能教学平台</small>
+        </span>
       </a>
-      <span class="nav-item off"><span class="nav-icon">🔍</span><span>知识检索</span></span>
-      <span class="nav-item off"><span class="nav-icon">💬</span><span>智能对话</span></span>
-      <span class="nav-item off"><span class="nav-icon">📝</span><span>作业批改</span></span>
-      <span class="nav-item off"><span class="nav-icon">💡</span><span>错题讲解</span></span>
-    </nav>
-    <div class="sidebar-foot">
-      <div class="demo-tip">本迭代仅开放「教学材料」<br>其余模块为后续课程预留</div>
-    </div>
-  </aside>
 
-  <div class="main">
-    <header class="topbar">
-      <div class="topbar-class">
-        <span class="dot"></span>
-        {{ user.class_name }} 班
+      <nav class="tabs">
+        <a class="tab tab-active" href="{{ url_for('pages.materials_page') }}">教学材料</a>
+        <span class="tab tab-off" title="后续课程开放">知识检索</span>
+        <span class="tab tab-off" title="后续课程开放">智能对话</span>
+        <span class="tab tab-off" title="后续课程开放">作业批改</span>
+        <span class="tab tab-off" title="后续课程开放">错题讲解</span>
+      </nav>
+
+      <div class="userbox">
+        <span class="class-chip"><i class="dot"></i>{{ user.class_name }} 班</span>
         <span class="badge badge-brand">{{ '教师' if user.role == 'teacher' else '学生' }}</span>
-      </div>
-      <div class="topbar-right">
         <span class="who">已登录：<strong>{{ user.username }}</strong></span>
         <form method="post" action="{{ url_for('auth.logout') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-          <button type="submit" class="logout">退出登录</button>
+          <button type="submit" class="logout">退出</button>
         </form>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main class="content">
-      <div class="page-head">
-        <div class="page-title">教学材料</div>
-        <div class="page-sub">共 {{ items|length }} 份 · 仅显示 {{ user.class_name }} 班的有效材料</div>
+  <section class="banner">
+    <div class="banner-inner">
+      <div>
+        <h1>教学材料</h1>
+        <p>仅显示 {{ user.class_name }} 班的有效材料，跨班资源在服务端即被隔离。</p>
       </div>
+      <div class="stat-strip">
+        <div class="stat"><b>{{ items|length }}</b><span>本班材料</span></div>
+        <div class="stat"><b>{{ user.class_name }}</b><span>所属班级</span></div>
+        <div class="stat"><b>{{ '教师' if user.role == 'teacher' else '学生' }}</b><span>当前角色</span></div>
+      </div>
+    </div>
+  </section>
 
-      <div class="stack">
+  <main class="shell">
+    <div class="stack">
 
-        {% if user.role == 'teacher' %}
-        <section class="card">
-          <div class="card-head"><div class="card-title">上传教学材料</div></div>
-          <div class="card-body">
-            <form id="upload-form" enctype="multipart/form-data">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-              <div class="uploader">
-                <div class="uploader-inner">
-                  <span class="uploader-ic">📄</span>
-                  <div style="flex:1 1 240px;min-width:0;">
-                    <input class="input" id="file" name="file" type="file" accept=".txt,.md" required>
-                  </div>
-                  <div style="flex:1 1 200px;min-width:0;">
-                    <input class="input" id="title" name="title" type="text"
-                           placeholder="标题（可选，省略则取文件名）">
-                  </div>
-                  <button type="submit" class="btn btn-primary">上传并入库</button>
+      {% if user.role == 'teacher' %}
+      <section class="card">
+        <div class="card-head">
+          <div class="card-title">上传教学材料</div>
+          <span class="badge badge-accent">教师可写</span>
+        </div>
+        <div class="card-body">
+          <form id="upload-form" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="uploader">
+              <div class="uploader-inner">
+                <span class="uploader-ic">📄</span>
+                <div style="flex:1 1 240px;min-width:0;">
+                  <span style="display:block;font-size:12.5px;color:var(--text-3);margin-bottom:5px;">选择文件</span>
+                  <input class="input" id="file" name="file" type="file" accept=".txt,.md" required>
+                </div>
+                <div style="flex:1 1 200px;min-width:0;">
+                  <span style="display:block;font-size:12.5px;color:var(--text-3);margin-bottom:5px;">标题（可选）</span>
+                  <input class="input" id="title" name="title" type="text"
+                         placeholder="省略则取文件名">
+                </div>
+                <button type="submit" class="btn btn-primary">上传并入库</button>
+              </div>
+            </div>
+            <p class="uploader-hint">仅支持 UTF-8 编码的 .txt / .md 文本，单个文件上限 10 MiB。</p>
+            <p id="upload-msg" class="msg"></p>
+          </form>
+        </div>
+      </section>
+      {% else %}
+      <section class="card">
+        <div class="readonly-bar">
+          <span style="font-size:24px;">👀</span>
+          <div>
+            <div style="font-weight:700;">只读模式</div>
+            <div class="row-meta">学生账号可读取与下载本班材料；上传、修改标题和删除仅限教师。</div>
+          </div>
+        </div>
+      </section>
+      {% endif %}
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-title">本班材料列表</div>
+          <span class="badge badge-neutral">{{ items|length }} 份</span>
+        </div>
+        <div class="card-body">
+          {% if not items %}
+          <div class="empty">
+            <span class="empty-ic">📭</span>
+            暂无材料。{{ '上传第一份讲义试试。' if user.role == 'teacher' else '等待本班教师上传。' }}
+          </div>
+          {% endif %}
+          <div id="material-list" class="row-list">
+            {% for item in items %}
+            <div class="list-row" data-id="{{ item.id }}">
+              <div class="grow">
+                <div class="row-title" data-role="title">{{ item.title }}</div>
+                <div class="row-meta">
+                  #{{ item.id }} · {{ item.original_filename }} ·
+                  {{ item.size_bytes }} 字节 · 上传于 {{ item.created_at | localtime }}
                 </div>
               </div>
-              <p class="uploader-hint">仅支持 UTF-8 编码的 .txt / .md 文本，单个文件上限 10 MiB。</p>
-              <p id="upload-msg" class="msg"></p>
-            </form>
-          </div>
-        </section>
-        {% else %}
-        <section class="card">
-          <div class="card-body" style="display:flex;align-items:center;gap:14px;">
-            <span style="font-size:24px;">👀</span>
-            <div>
-              <div style="font-weight:700;">只读模式</div>
-              <div class="row-meta">学生账号可读取与下载本班材料；上传、修改标题和删除仅限教师。</div>
-            </div>
-          </div>
-        </section>
-        {% endif %}
-
-        <section class="card">
-          <div class="card-head">
-            <div class="card-title">本班材料列表</div>
-            <span class="badge badge-neutral">{{ items|length }} 份</span>
-          </div>
-          <div class="card-body">
-            {% if not items %}
-            <div class="empty">
-              <span class="empty-ic">📭</span>
-              暂无材料。{{ '上传第一份讲义试试。' if user.role == 'teacher' else '等待本班教师上传。' }}
-            </div>
-            {% endif %}
-            <div id="material-list">
-              {% for item in items %}
-              <div class="list-row" data-id="{{ item.id }}">
-                <div class="grow">
-                  <div class="row-title" data-role="title">{{ item.title }}</div>
-                  <div class="row-meta">
-                    #{{ item.id }} · {{ item.original_filename }} ·
-                    {{ item.size_bytes }} 字节 · 上传于 {{ item.created_at | localtime }}
-                  </div>
-                </div>
-                <div class="row-actions">
-                  <button type="button" class="btn btn-outline btn-sm" data-act="read">读取全文</button>
-                  <button type="button" class="btn btn-outline btn-sm" data-act="download">下载原文件</button>
-                  {% if user.role == 'teacher' %}
-                  <input type="text" class="input" data-role="rename-input"
-                         placeholder="新标题" style="width:170px;padding:6px 10px;font-size:13px;">
-                  <button type="button" class="btn btn-primary btn-sm" data-act="rename">修改标题</button>
-                  <button type="button" class="btn btn-danger btn-sm" data-act="delete">删除</button>
-                  {% endif %}
-                </div>
-                <pre class="doc-body" data-role="body" hidden style="flex-basis:100%;"></pre>
+              <div class="row-actions">
+                <button type="button" class="btn btn-outline btn-sm" data-act="read">读取全文</button>
+                <button type="button" class="btn btn-outline btn-sm" data-act="download">下载原文件</button>
+                {% if user.role == 'teacher' %}
+                <input type="text" class="input" data-role="rename-input"
+                       placeholder="新标题" style="width:160px;padding:6px 10px;font-size:13px;">
+                <button type="button" class="btn btn-primary btn-sm" data-act="rename">修改标题</button>
+                <button type="button" class="btn btn-danger btn-sm" data-act="delete">删除</button>
+                {% endif %}
               </div>
-              {% endfor %}
+              <pre class="doc-body" data-role="body" hidden style="flex-basis:100%;"></pre>
             </div>
+            {% endfor %}
           </div>
-        </section>
+        </div>
+        <div class="card-note">
+          本迭代开放「教学材料」模块，其余导航项为后续课程预留，尚未实现。
+        </div>
+      </section>
 
-      </div>
-    </main>
-  </div>
+    </div>
+  </main>
 </div>
 
 <script>

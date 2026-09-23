@@ -15,6 +15,7 @@ from campusclaw import StartupError, create_app
 from campusclaw.config import SEED_ACCOUNTS, ConfigError
 
 ROLE_LABEL = {"teacher": "教师", "student": "学生"}
+MASKED_PASSWORD = "********"
 
 
 def build():
@@ -47,8 +48,12 @@ def print_startup_banner() -> None:
         "  预置账号（用户名 / 口令）",
     ]
     for account in SEED_ACCOUNTS:
-        password = settings.seed_passwords.get(account.username, "<未设置>")
         role = ROLE_LABEL.get(account.role, account.role)
+        # 仅回显内置演示口令；来自环境变量的口令属于服务端密钥，一律不落日志。
+        if account.username in settings.dev_defaults:
+            password = settings.seed_passwords.get(account.username, "<未设置>")
+        else:
+            password = MASKED_PASSWORD
         lines.append(
             f"    {account.username:<12}{password:<15}{role} · {account.class_name} 班"
         )

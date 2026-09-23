@@ -188,6 +188,11 @@ python scripts/selfcheck.py
 
 `scripts/selfcheck.py` 不会污染项目目录，跑完自动清理。
 
+界面预览（视觉系统对齐 CampusClaw 官方演示站）：
+
+- 登录页 [`docs/screenshots/08-ui-login.png`](docs/screenshots/08-ui-login.png)
+- 材料页 [`docs/screenshots/09-ui-materials.png`](docs/screenshots/09-ui-materials.png)
+
 ## 七、目录结构
 
 ```

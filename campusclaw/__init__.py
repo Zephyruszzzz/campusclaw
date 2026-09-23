@@ -11,7 +11,7 @@ from typing import Any
 
 from flask import Flask
 
-from campusclaw import bootstrap, db as dbmod, storage
+from campusclaw import bootstrap, db as dbmod, storage, timeutil
 from campusclaw.config import ConfigError, Settings, load_settings
 from campusclaw.errors import register_error_handlers
 from campusclaw.request_context import close_conn, register_page_redirect
@@ -88,6 +88,8 @@ def create_app(
         JSON_SORT_KEYS=False,
     )
     app.extensions["campusclaw"] = {"settings": settings}
+    # 仅供页面展示：把 UTC 入库时间转成本地可读格式，API 仍返回原始值。
+    app.jinja_env.filters["localtime"] = timeutil.to_local_display
 
     app.teardown_appcontext(close_conn)
 

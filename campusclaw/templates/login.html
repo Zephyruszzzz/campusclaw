@@ -1,17 +1,71 @@
 {% extends "base.html" %}
 {% block title %}登录 · CampusClaw{% endblock %}
-{% block content %}
-<div class="card" style="max-width: 420px; margin: 8px auto;">
-  <h2>登录 CampusClaw</h2>
-  <form method="post" action="{{ url_for('auth.login') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="username">账号</label>
-    <input id="username" name="username" type="text" autocomplete="username" autofocus>
-    <label for="password">密码</label>
-    <input id="password" name="password" type="password" autocomplete="current-password">
-    <div class="row" style="margin-top: 18px;">
-      <button type="submit">登录</button>
+{% block body %}
+<div class="login">
+
+  <section class="login-hero">
+    <span class="login-badge">🎓 中小学教研智能体平台</span>
+    <h1>CampusClaw</h1>
+    <p class="login-sub">
+      按班级统一管理教学材料。教师上传讲义，本班师生读取，
+      跨班数据严格隔离，权限与班级边界全部由服务端判定。
+    </p>
+    <div class="login-features">
+      <span>🔒 跨班隔离与角色授权</span>
+      <span>📚 材料入库与知识全文解析</span>
+      <span>🐳 Docker Compose 一键启动</span>
     </div>
-  </form>
+  </section>
+
+  <section class="login-panel">
+    <div class="login-panel-title">登录 CampusClaw</div>
+    <p class="login-hint">使用预置账号登录。学生账号只读本班材料，不能上传或修改。</p>
+
+    <form class="login-form" method="post" action="{{ url_for('auth.login') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="field">
+        <span>账号</span>
+        <input class="input" id="username" name="username" type="text"
+               autocomplete="username" autofocus required>
+      </div>
+      <div class="field">
+        <span>密码</span>
+        <input class="input" id="password" name="password" type="password"
+               autocomplete="current-password" required>
+      </div>
+      <div style="margin-top:18px;">
+        <button type="submit" class="btn btn-primary btn-block">登录</button>
+      </div>
+    </form>
+
+    <div class="divider">预置账号（点击填入）</div>
+    <div class="account-list">
+      {% for account in accounts %}
+      <button type="button" class="account"
+              data-username="{{ account.username }}"
+              data-password="{{ account.password }}">
+        <span class="account-avatar">{{ account.emoji }}</span>
+        <span class="account-info">
+          <span class="account-name">{{ account.username }}</span>
+          <span class="account-meta">{{ account.role }} · {{ account.class_name }} 班</span>
+        </span>
+        <span class="account-go">填入 →</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <p class="login-foot">内置演示凭据，仅供本机体验；正式部署请用环境变量覆盖</p>
+  </section>
+
 </div>
+
+<script>
+  document.querySelectorAll('.account').forEach(function (button) {
+    button.addEventListener('click', function () {
+      document.getElementById('username').value = button.dataset.username;
+      document.getElementById('password').value = button.dataset.password;
+      document.getElementById('password').focus();
+    });
+  });
+</script>
 {% endblock %}

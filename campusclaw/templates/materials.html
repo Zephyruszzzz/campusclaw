@@ -1,63 +1,133 @@
 {% extends "base.html" %}
 {% block title %}教学材料 · CampusClaw{% endblock %}
-{% block header_actions %}
-<div class="who">
-  已登录：<strong>{{ user.username }}</strong>（{{ '教师' if user.role == 'teacher' else '学生' }}·{{ user.class_name }} 班）
-  <form method="post" action="{{ url_for('auth.logout') }}" style="display:inline; margin-left:12px;">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button type="submit" class="link">退出登录</button>
-  </form>
-</div>
-{% endblock %}
-{% block content %}
+{% block body %}
+<div class="layout">
 
-{% if user.role == 'teacher' %}
-<div class="card">
-  <h2>上传教学材料</h2>
-  <form id="upload-form" enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <div class="row">
-      <div class="grow"><input id="file" name="file" type="file" accept=".txt,.md"></div>
-      <div class="grow"><input id="title" name="title" type="text" placeholder="标题（可选，省略则取文件名）"></div>
-      <button type="submit">上传并入库</button>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🎓</div>
+      <div class="brand-text">
+        <div class="brand-name">CampusClaw</div>
+        <div class="brand-sub">智能教学平台</div>
+      </div>
     </div>
-    <p class="meta">仅支持 UTF-8 的 .txt / .md 文本，单个文件上限 10 MiB。</p>
-    <p id="upload-msg" class="meta"></p>
-  </form>
-</div>
-{% else %}
-<div class="card">
-  <h2>本班教学材料</h2>
-  <p class="meta">学生账号只读。材料由本班教师上传与管理。</p>
-</div>
-{% endif %}
+    <div class="nav-role">{{ '教师端' if user.role == 'teacher' else '学生端' }}</div>
+    <nav class="nav">
+      <a class="nav-item nav-item-active" href="{{ url_for('pages.materials_page') }}">
+        <span class="nav-icon">📚</span><span>教学材料</span>
+      </a>
+      <span class="nav-item off"><span class="nav-icon">🔍</span><span>知识检索</span></span>
+      <span class="nav-item off"><span class="nav-icon">💬</span><span>智能对话</span></span>
+      <span class="nav-item off"><span class="nav-icon">📝</span><span>作业批改</span></span>
+      <span class="nav-item off"><span class="nav-icon">💡</span><span>错题讲解</span></span>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="demo-tip">本迭代仅开放「教学材料」<br>其余模块为后续课程预留</div>
+    </div>
+  </aside>
 
-<div class="card">
-  <h2>本班材料列表（共 {{ items|length }} 份）</h2>
-  {% if not items %}
-  <p class="empty">暂无材料。</p>
-  {% endif %}
-  <ul class="list" id="material-list">
-    {% for item in items %}
-    <li data-id="{{ item.id }}">
-      <div class="title" data-role="title">{{ item.title }}</div>
-      <div class="meta">
-        编号 {{ item.id }} · 原文件 {{ item.original_filename }} ·
-        {{ item.size_bytes }} 字节 · 上传于 {{ item.created_at }}
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-class">
+        <span class="dot"></span>
+        {{ user.class_name }} 班
+        <span class="badge badge-brand">{{ '教师' if user.role == 'teacher' else '学生' }}</span>
       </div>
-      <div class="row" style="margin-top:8px;">
-        <button type="button" class="ghost" data-act="read">读取全文</button>
-        <button type="button" class="ghost" data-act="download">下载原文件</button>
+      <div class="topbar-right">
+        <span class="who">已登录：<strong>{{ user.username }}</strong></span>
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit" class="logout">退出登录</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="page-head">
+        <div class="page-title">教学材料</div>
+        <div class="page-sub">共 {{ items|length }} 份 · 仅显示 {{ user.class_name }} 班的有效材料</div>
+      </div>
+
+      <div class="stack">
+
         {% if user.role == 'teacher' %}
-        <input type="text" class="grow" data-role="rename-input" placeholder="新标题" style="max-width:240px;">
-        <button type="button" data-act="rename">修改标题</button>
-        <button type="button" class="danger" data-act="delete">删除</button>
+        <section class="card">
+          <div class="card-head"><div class="card-title">上传教学材料</div></div>
+          <div class="card-body">
+            <form id="upload-form" enctype="multipart/form-data">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <div class="uploader">
+                <div class="uploader-inner">
+                  <span class="uploader-ic">📄</span>
+                  <div style="flex:1 1 240px;min-width:0;">
+                    <input class="input" id="file" name="file" type="file" accept=".txt,.md" required>
+                  </div>
+                  <div style="flex:1 1 200px;min-width:0;">
+                    <input class="input" id="title" name="title" type="text"
+                           placeholder="标题（可选，省略则取文件名）">
+                  </div>
+                  <button type="submit" class="btn btn-primary">上传并入库</button>
+                </div>
+              </div>
+              <p class="uploader-hint">仅支持 UTF-8 编码的 .txt / .md 文本，单个文件上限 10 MiB。</p>
+              <p id="upload-msg" class="msg"></p>
+            </form>
+          </div>
+        </section>
+        {% else %}
+        <section class="card">
+          <div class="card-body" style="display:flex;align-items:center;gap:14px;">
+            <span style="font-size:24px;">👀</span>
+            <div>
+              <div style="font-weight:700;">只读模式</div>
+              <div class="row-meta">学生账号可读取与下载本班材料；上传、修改标题和删除仅限教师。</div>
+            </div>
+          </div>
+        </section>
         {% endif %}
+
+        <section class="card">
+          <div class="card-head">
+            <div class="card-title">本班材料列表</div>
+            <span class="badge badge-neutral">{{ items|length }} 份</span>
+          </div>
+          <div class="card-body">
+            {% if not items %}
+            <div class="empty">
+              <span class="empty-ic">📭</span>
+              暂无材料。{{ '上传第一份讲义试试。' if user.role == 'teacher' else '等待本班教师上传。' }}
+            </div>
+            {% endif %}
+            <div id="material-list">
+              {% for item in items %}
+              <div class="list-row" data-id="{{ item.id }}">
+                <div class="grow">
+                  <div class="row-title" data-role="title">{{ item.title }}</div>
+                  <div class="row-meta">
+                    #{{ item.id }} · {{ item.original_filename }} ·
+                    {{ item.size_bytes }} 字节 · 上传于 {{ item.created_at | localtime }}
+                  </div>
+                </div>
+                <div class="row-actions">
+                  <button type="button" class="btn btn-outline btn-sm" data-act="read">读取全文</button>
+                  <button type="button" class="btn btn-outline btn-sm" data-act="download">下载原文件</button>
+                  {% if user.role == 'teacher' %}
+                  <input type="text" class="input" data-role="rename-input"
+                         placeholder="新标题" style="width:170px;padding:6px 10px;font-size:13px;">
+                  <button type="button" class="btn btn-primary btn-sm" data-act="rename">修改标题</button>
+                  <button type="button" class="btn btn-danger btn-sm" data-act="delete">删除</button>
+                  {% endif %}
+                </div>
+                <pre class="doc-body" data-role="body" hidden style="flex-basis:100%;"></pre>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
       </div>
-      <pre class="body" data-role="body" hidden></pre>
-    </li>
-    {% endfor %}
-  </ul>
+    </main>
+  </div>
 </div>
 
 <script>
@@ -65,18 +135,17 @@
   function headers(extra) {
     return Object.assign({'X-CSRF-Token': csrf}, extra || {});
   }
-  document.querySelectorAll('#material-list li').forEach(function (li) {
-    const id = li.getAttribute('data-id');
-    const bodyNode = li.querySelector('[data-role=body]');
-    li.querySelectorAll('button[data-act]').forEach(function (btn) {
+  document.querySelectorAll('#material-list .list-row').forEach(function (row) {
+    const id = row.getAttribute('data-id');
+    const bodyNode = row.querySelector('[data-role=body]');
+    row.querySelectorAll('button[data-act]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const act = btn.getAttribute('data-act');
         if (act === 'read') {
           fetch('/api/materials/' + encodeURIComponent(id), {headers: headers(), cache: 'no-store'})
             .then(function (r) { return r.json(); })
             .then(function (data) {
-              if (data.error) { bodyNode.textContent = '读取失败：' + data.error.code; }
-              else { bodyNode.textContent = data.body_text || ''; }
+              bodyNode.textContent = data.error ? ('读取失败：' + data.error.code) : (data.body_text || '');
               bodyNode.hidden = false;
             });
         }
@@ -86,17 +155,33 @@
             .then(function (text) { bodyNode.textContent = text; bodyNode.hidden = false; });
         }
         if (act === 'rename') {
-          const title = li.querySelector('[data-role=rename-input]').value;
+          const title = row.querySelector('[data-role=rename-input]').value;
           fetch('/api/materials/' + encodeURIComponent(id), {
             method: 'PATCH',
             headers: headers({'Content-Type': 'application/json'}),
             body: JSON.stringify({title: title})
-          }).then(function () { window.location.reload(); });
+          }).then(function (r) {
+            if (r.ok) { window.location.reload(); }
+            else {
+              r.json().then(function (b) {
+                bodyNode.textContent = '修改失败：' + (b.error ? b.error.code : r.status);
+                bodyNode.hidden = false;
+              });
+            }
+          });
         }
         if (act === 'delete') {
           fetch('/api/materials/' + encodeURIComponent(id), {
             method: 'DELETE', headers: headers()
-          }).then(function () { window.location.reload(); });
+          }).then(function (r) {
+            if (r.ok) { window.location.reload(); }
+            else {
+              r.json().then(function (b) {
+                bodyNode.textContent = '删除失败：' + (b.error ? b.error.code : r.status);
+                bodyNode.hidden = false;
+              });
+            }
+          });
         }
       });
     });
@@ -107,16 +192,24 @@
       event.preventDefault();
       const data = new FormData(form);
       const msg = document.getElementById('upload-msg');
-      msg.className = 'meta';
+      const uploader = form.querySelector('.uploader');
+      msg.className = 'msg';
       msg.textContent = '上传中…';
+      uploader.classList.add('busy');
       fetch('/api/materials/upload', {method: 'POST', headers: {'X-CSRF-Token': csrf}, body: data})
         .then(function (r) { return r.json().then(function (b) { return {status: r.status, body: b}; }); })
         .then(function (res) {
+          uploader.classList.remove('busy');
           if (res.status === 201) { window.location.reload(); }
           else {
-            msg.className = 'err';
+            msg.className = 'msg msg-err';
             msg.textContent = '上传失败 ' + res.status + '：' + (res.body.error ? res.body.error.code : '未知');
           }
+        })
+        .catch(function () {
+          uploader.classList.remove('busy');
+          msg.className = 'msg msg-err';
+          msg.textContent = '上传失败：网络或服务异常';
         });
     });
   }

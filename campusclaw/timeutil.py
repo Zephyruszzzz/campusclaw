@@ -25,3 +25,15 @@ def parse_iso(value: str) -> datetime:
 
 def plus_hours(moment: datetime, hours: int) -> datetime:
     return moment + timedelta(hours=hours)
+
+
+def to_local_display(value: str) -> str:
+    """把入库的 UTC ISO 时间转成本地时区的可读串，仅用于页面展示。
+
+    解析失败时原样返回，展示层不得影响数据本身。
+    """
+    try:
+        moment = parse_iso(value).astimezone()
+    except (ValueError, TypeError):
+        return value
+    return moment.strftime("%Y-%m-%d %H:%M")

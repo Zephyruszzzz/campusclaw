@@ -6,15 +6,35 @@ from flask import Blueprint, redirect, render_template, request, session, url_fo
 
 from campusclaw import request_context as rc
 from campusclaw import security, sessions
+from campusclaw.config import DEFAULT_SEED_PASSWORDS, SEED_ACCOUNTS
 from campusclaw.errors import MESSAGES, ApiError
 
 bp = Blueprint("auth", __name__)
+
+#: 登录页的预置账号速填卡片。只用于展示内置演示凭据，不参与任何鉴权判定。
+_AVATARS = {
+    ("teacher", "A"): "👩‍🏫",
+    ("student", "A"): "🧑‍🎓",
+    ("student", "B"): "👧",
+    ("teacher", "B"): "👨‍🏫",
+}
+
+DEMO_ACCOUNTS = [
+    {
+        "username": account.username,
+        "password": DEFAULT_SEED_PASSWORDS[account.username],
+        "role": "教师" if account.role == "teacher" else "学生",
+        "class_name": account.class_name,
+        "emoji": _AVATARS.get((account.role, account.class_name), "👤"),
+    }
+    for account in SEED_ACCOUNTS
+]
 
 
 @bp.get("/login")
 def login_page():
     token = rc.ensure_csrf_token()
-    return render_template("login.html", csrf_token=token)
+    return render_template("login.html", csrf_token=token, accounts=DEMO_ACCOUNTS)
 
 
 @bp.post("/login")

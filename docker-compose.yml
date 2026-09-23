@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    image: campusclaw:latest
+    container_name: campusclaw-app
+    environment:
+      # 全部留空时应用会回落到内置测试凭据（见 README「预置账号」），
+      # 因此本文件不存在也能 `docker compose up` 直接跑起来。
+      # 若项目根目录放了 .env，Compose 会自动读取其中的同名变量填进下面各项。
+      SECRET_KEY: "${SECRET_KEY:-}"
+      SEED_TEACHER_A_PASSWORD: "${SEED_TEACHER_A_PASSWORD:-}"
+      SEED_STUDENT_A1_PASSWORD: "${SEED_STUDENT_A1_PASSWORD:-}"
+      SEED_STUDENT_B1_PASSWORD: "${SEED_STUDENT_B1_PASSWORD:-}"
+      SEED_TEACHER_B_PASSWORD: "${SEED_TEACHER_B_PASSWORD:-}"
+      AUTH_COOKIE_SECURE: "${AUTH_COOKIE_SECURE:-false}"
+      CAMPUSCLAW_STRICT_CONFIG: "${CAMPUSCLAW_STRICT_CONFIG:-}"
+    ports:
+      # 只想改宿主机端口时：设置 CAMPUSCLAW_PORT=8090 后再 up。
+      - "${CAMPUSCLAW_PORT:-8080}:8080"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    healthcheck:
+      # 仅用容器内标准库探测，不依赖 curl。
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 10s
+      timeout: 3s
+      start_period: 30s
+      retries: 3

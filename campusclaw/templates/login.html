@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}登录 · CampusClaw{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 420px; margin: 8px auto;">
+  <h2>登录 CampusClaw</h2>
+  <form method="post" action="{{ url_for('auth.login') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="username">账号</label>
+    <input id="username" name="username" type="text" autocomplete="username" autofocus>
+    <label for="password">密码</label>
+    <input id="password" name="password" type="password" autocomplete="current-password">
+    <div class="row" style="margin-top: 18px;">
+      <button type="submit">登录</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

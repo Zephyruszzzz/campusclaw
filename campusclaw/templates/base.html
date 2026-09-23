@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}CampusClaw{% endblock %}</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 0 64px;
+    background: #f5f6f8; color: #1f2328;
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.6;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px; }
+  header.bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 24px;
+  }
+  .brand { font-size: 22px; font-weight: 700; letter-spacing: .02em; }
+  .tagline { color: #57606a; font-size: 13px; }
+  .card {
+    background: #fff; border: 1px solid #d8dee4; border-radius: 10px;
+    padding: 20px 22px; margin-bottom: 18px;
+  }
+  .who { font-size: 13px; color: #57606a; }
+  .who strong { color: #1f2328; }
+  h2 { font-size: 17px; margin: 0 0 14px; }
+  label { display: block; margin: 12px 0 6px; font-size: 13px; color: #424a53; }
+  input[type=text], input[type=password], input[type=file] {
+    width: 100%; padding: 9px 11px; border: 1px solid #cfd6dd;
+    border-radius: 7px; font-size: 14px; background: #fff;
+  }
+  button {
+    padding: 8px 16px; border: 0; border-radius: 7px; cursor: pointer;
+    background: #1f6feb; color: #fff; font-size: 14px;
+  }
+  button.link {
+    background: transparent; color: #1f6feb; padding: 4px 0;
+    text-decoration: underline; font-size: 13px;
+  }
+  button.danger { background: #b62324; }
+  button.ghost { background: #6e7781; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .grow { flex: 1 1 260px; }
+  ul.list { list-style: none; margin: 0; padding: 0; }
+  ul.list > li {
+    border: 1px solid #d8dee4; border-radius: 9px; padding: 14px 16px;
+    margin-bottom: 12px; background: #fcfcfd;
+  }
+  .title { font-weight: 600; }
+  .meta { color: #57606a; font-size: 12.5px; margin-top: 4px; }
+  pre.body {
+    white-space: pre-wrap; word-break: break-word;
+    background: #f6f8fa; border: 1px solid #d8dee4; border-radius: 7px;
+    padding: 12px; margin-top: 10px; font-size: 13.5px; max-height: 320px; overflow: auto;
+  }
+  .empty { color: #57606a; }
+  .err { color: #b62324; font-size: 13px; }
+  .ok { color: #1a7f37; font-size: 13px; }
+  footer.foot { color: #8c959f; font-size: 12px; margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div>
+      <div class="brand">CampusClaw</div>
+      <div class="tagline">按班级统一管理教学材料</div>
+    </div>
+    {% block header_actions %}{% endblock %}
+  </header>
+  {% block content %}{% endblock %}
+  <footer class="foot">CampusClaw · 教学材料按班级隔离 · 上传 Material ID 仅在服务端生成</footer>
+</div>
+</body>
+</html>
